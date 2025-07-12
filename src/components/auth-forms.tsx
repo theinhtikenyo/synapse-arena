@@ -86,14 +86,14 @@ export function AuthForms() {
       await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({
         title: "Signed In Successfully",
-        description: "Welcome back to Synapse Arena!",
+        description: "Welcome back!",
       });
       router.push('/dashboard');
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Sign In Failed",
-        description: error.message,
+        description: "Invalid email or password. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -106,7 +106,7 @@ export function AuthForms() {
       await createUserWithEmailAndPassword(auth, values.email, values.password);
       toast({
         title: "Account Created",
-        description: "Welcome to Synapse Arena! You can now sign in.",
+        description: "Welcome! You can now sign in.",
       });
        router.push('/dashboard');
     } catch (error: any) {
@@ -127,14 +127,14 @@ export function AuthForms() {
       await signInWithPopup(auth, provider);
       toast({
         title: "Signed In Successfully",
-        description: "Welcome to Synapse Arena!",
+        description: "Welcome!",
       });
       router.push('/dashboard');
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Google Sign-In Failed",
-        description: error.message,
+        description: "Could not sign in with Google. Please try again.",
       });
     } finally {
       setIsLoading(false);
