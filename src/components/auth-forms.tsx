@@ -24,6 +24,15 @@ import {
 } from "@/components/ui/tabs";
 import { Icons } from "@/components/icons";
 import { Loader2 } from "lucide-react";
+import { auth } from "@/lib/firebase";
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup
+} from "firebase/auth";
+import { useRouter } from "next/navigation";
+
 
 const signInSchema = z.object({
   email: z.string().email({
@@ -52,6 +61,7 @@ const signUpSchema = z
 export function AuthForms() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   const signInForm = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -70,29 +80,67 @@ export function AuthForms() {
     },
   });
 
-  const onSignInSubmit = (values: z.infer<typeof signInSchema>) => {
+  const onSignInSubmit = async (values: z.infer<typeof signInSchema>) => {
     setIsLoading(true);
-    console.log("Sign In:", values);
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({
         title: "Signed In Successfully",
-        description: "Welcome back to Synapse Arena!",
+        description: "Welcome back!",
       });
-    }, 1500);
+      router.push('/dashboard');
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Sign In Failed",
+        description: "Invalid email or password. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const onSignUpSubmit = (values: z.infer<typeof signUpSchema>) => {
+  const onSignUpSubmit = async (values: z.infer<typeof signUpSchema>) => {
     setIsLoading(true);
-    console.log("Sign Up:", values);
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await createUserWithEmailAndPassword(auth, values.email, values.password);
       toast({
         title: "Account Created",
-        description: "Welcome to Synapse Arena! You can now sign in.",
+        description: "Welcome! You can now sign in.",
       });
-    }, 1500);
+       router.push('/dashboard');
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Sign Up Failed",
+        description: error.message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const onGoogleSignIn = async () => {
+    setIsLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      toast({
+        title: "Signed In Successfully",
+        description: "Welcome!",
+      });
+      router.push('/dashboard');
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Google Sign-In Failed",
+        description: "Could not sign in with Google. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
 
   return (
     <Tabs defaultValue="sign-in" className="w-full">
@@ -154,12 +202,9 @@ export function AuthForms() {
               </span>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <Button variant="outline" type="button" disabled={isLoading}>
-              <Icons.github className="mr-2 h-4 w-4" />
-              GitHub
-            </Button>
-            <Button variant="outline" type="button" disabled={isLoading}>
+          <div className="grid">
+            <Button variant="outline" type="button" disabled={isLoading} onClick={onGoogleSignIn}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               <Icons.google className="mr-2 h-4 w-4" />
               Google
             </Button>
