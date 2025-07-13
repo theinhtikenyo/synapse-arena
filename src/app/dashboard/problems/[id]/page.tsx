@@ -14,12 +14,13 @@ export default function ProblemPage({ params }: { params: { id: string } }) {
   const [problem, setProblem] = useState<DocumentData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { id } = params;
 
   useEffect(() => {
     const fetchProblem = async () => {
-      if (!params.id) return;
+      if (!id) return;
       try {
-        const docRef = doc(db, 'problems', params.id);
+        const docRef = doc(db, 'problems', id);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
@@ -36,7 +37,7 @@ export default function ProblemPage({ params }: { params: { id: string } }) {
     };
 
     fetchProblem();
-  }, [params.id]);
+  }, [id]);
 
   if (loading) {
     return (
