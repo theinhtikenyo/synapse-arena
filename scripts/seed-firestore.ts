@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import admin from '../src/lib/firebase-admin';
 
 const problems = [
