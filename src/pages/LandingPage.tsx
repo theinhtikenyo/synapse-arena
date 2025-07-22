@@ -10,17 +10,22 @@ import {
   Play,
 } from "lucide-react";
 import { useEvent } from "../contexts/EventContext";
-import { useProblem } from "../contexts/ProblemContext";
 import Timer from "../components/Timer";
 
 function LandingPage() {
   const { events } = useEvent();
-  const { problems } = useProblem();
 
   const upcomingEvents = events
     .filter((e) => e.status === "registration" || e.status === "active")
     .slice(0, 3);
-  const featuredProblems = problems.slice(0, 6);
+  const featuredProblems = [
+    { id: '1', title: 'Two Sum', difficulty: 'Easy', description: 'Given an array of integers, return indices of the two numbers such that they add up to a specific target.', category: 'Arrays', points: 10 },
+    { id: '2', title: 'Valid Parentheses', difficulty: 'Easy', description: "Given a string containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.", category: 'Stacks', points: 15 },
+    { id: '3', title: 'Merge Two Sorted Lists', difficulty: 'Easy', description: 'Merge two sorted linked lists and return it as a new sorted list.', category: 'Linked List', points: 15 },
+    { id: '4', title: 'Longest Substring Without Repeating Characters', difficulty: 'Medium', description: 'Given a string, find the length of the longest substring without repeating characters.', category: 'Strings', points: 25 },
+    { id: '5', title: '3Sum', difficulty: 'Medium', description: 'Given an array of integers, are there elements a, b, c such that a + b + c = 0? Find all unique triplets in the array which gives the sum of zero.', category: 'Arrays', points: 30 },
+    { id: '6', title: 'Binary Tree Inorder Traversal', difficulty: 'Easy', description: 'Given the root of a binary tree, return the inorder traversal of its nodes\' values.', category: 'Trees', points: 20 },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900">
@@ -80,13 +85,13 @@ function LandingPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
               <div className="text-3xl font-bold text-orange-500">
-                {problems.length}
+                30+
               </div>
               <div className="text-gray-300">Problems</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-orange-500">
-                {events.length}
+                5++
               </div>
               <div className="text-gray-300">Events</div>
             </div>
@@ -203,10 +208,7 @@ function LandingPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredProblems.map((problem) => (
-                <div
-                  key={problem.id}
-                  className="bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-orange-500 transition-colors"
-                >
+                <Link to="/login" key={problem.id} className="block bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-orange-500 transition-colors">
                   <div className="flex items-start justify-between mb-3">
                     <h3 className="text-lg font-semibold text-white group-hover:text-orange-400 transition-colors">
                       {problem.title}
@@ -236,16 +238,15 @@ function LandingPage() {
                       <span className="text-orange-500 font-bold">
                         {problem.points} pts
                       </span>
-                      <Link
-                        to="/login"
+                      <div
                         className="text-sm text-orange-400 hover:text-orange-300 font-medium flex items-center space-x-1"
                       >
                         <span>Solve</span>
                         <ArrowRight className="h-3 w-3" />
-                      </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
 

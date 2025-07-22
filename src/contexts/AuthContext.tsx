@@ -139,6 +139,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
       
       await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
+      setUser(newUser); // Immediately update user state after signup
     } catch (error: any) {
       throw new Error(error.message);
     } finally {

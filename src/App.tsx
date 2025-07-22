@@ -16,7 +16,7 @@ import Login from './pages/Login';
 import EventResultsPage from './pages/EventResultsPage';
 
 function AppContent() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -33,6 +33,10 @@ function AppContent() {
       }
     }
   }, [user, navigate, location.pathname]);
+
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen"><span>Loading...</span></div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Code, Mail, Lock, Eye, EyeOff, User, Upload } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import { useTheme } from "../contexts/ThemeContext";
 
 // Function to generate initials from name
 const getInitials = (name: string) => {
@@ -19,11 +20,12 @@ function Login() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [avatar, setAvatar] = useState("");
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { user, login, signup, loginWithGoogle } = useAuth();
+  useTheme();
 
   // Redirect if user is already logged in
   useEffect(() => {
@@ -39,7 +41,6 @@ function Login() {
   const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setAvatarFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
         setAvatar(e.target?.result as string);
@@ -47,13 +48,11 @@ function Login() {
       reader.readAsDataURL(file);
     } else {
       setAvatar("");
-      setAvatarFile(null);
     }
   };
 
   const removeAvatar = () => {
     setAvatar("");
-    setAvatarFile(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,8 +66,12 @@ function Login() {
       } else {
         await login(email, password);
       }
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("An unknown error occurred");
+      }
     } finally {
       setLoading(false);
     }
@@ -80,24 +83,28 @@ function Login() {
 
     try {
       await loginWithGoogle();
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("An unknown error occurred");
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-gray-100 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-orange-50 to-gray-100 dark:bg-gradient-to-br dark:from-black dark:to-gray-800">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center mb-4">
             <Code className="h-12 w-12 text-orange-500" />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
             {isSignUp ? "Join Synapse Area" : "Welcome to Synapse Area"}
           </h2>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
             {isSignUp ? "Create your account" : "Sign in to your account"}
           </p>
         </div>
@@ -114,12 +121,17 @@ function Login() {
               <div>
                 <label
                   htmlFor="name"
-                  className="block text-sm font-medium text-gray-700"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
                   Full Name
                 </label>
                 <div className="mt-1 relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                    <User
+                      className="h-5 w-5 text-gray-400 dark:text-gray-500"
+                      aria-hidden="true"
+                    />
+                  </div>
                   <input
                     id="name"
                     name="name"
@@ -127,7 +139,7 @@ function Login() {
                     required={isSignUp}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="appearance-none relative block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
+                    className="appearance-none block w-full pl-10 pr-3 py-2 border rounded-md sm:text-sm bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 placeholder-gray-500 text-gray-900 dark:text-white focus:ring-orange-500 focus:border-orange-500"
                     placeholder="Enter your full name"
                   />
                 </div>
@@ -137,12 +149,17 @@ function Login() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Email address
               </label>
               <div className="mt-1 relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                  <Mail
+                    className="h-5 w-5 text-gray-400 dark:text-gray-500"
+                    aria-hidden="true"
+                  />
+                </div>
                 <input
                   id="email"
                   name="email"
@@ -150,7 +167,7 @@ function Login() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none relative block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
+                  className="appearance-none block w-full pl-10 pr-3 py-2 border rounded-md sm:text-sm bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 placeholder-gray-500 text-gray-900 dark:text-white focus:ring-orange-500 focus:border-orange-500"
                   placeholder="Enter your email"
                 />
               </div>
@@ -159,12 +176,17 @@ function Login() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Password
               </label>
               <div className="mt-1 relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                  <Lock
+                    className="h-5 w-5 text-gray-400 dark:text-gray-500"
+                    aria-hidden="true"
+                  />
+                </div>
                 <input
                   id="password"
                   name="password"
@@ -172,69 +194,90 @@ function Login() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none relative block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
+                  className="appearance-none block w-full pl-10 pr-10 py-2 border rounded-md sm:text-sm bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 placeholder-gray-500 text-gray-900 dark:text-white focus:ring-orange-500 focus:border-orange-500"
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400 z-10"
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
+                    <EyeOff className="h-5 w-5" aria-hidden="true" />
                   ) : (
-                    <Eye className="h-5 w-5" />
+                    <Eye className="h-5 w-5" aria-hidden="true" />
                   )}
                 </button>
               </div>
             </div>
+          </div>
 
-            {isSignUp && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Profile Picture
+          {!isSignUp && (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="h-4 w-4 text-orange-600 focus:ring-orange-500 rounded bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600"
+                />
+                <label
+                  htmlFor="remember-me"
+                  className="ml-2 block text-sm text-gray-900 dark:text-gray-100"
+                >
+                  Remember me
                 </label>
-                <div className="flex items-center space-x-4">
-                  <div className="relative">
-                    {avatar ? (
-                      <img
-                        src={avatar}
-                        alt="Profile preview"
-                        className="w-16 h-16 rounded-full border-2 border-gray-300 object-cover"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 rounded-full border-2 border-gray-300 bg-orange-500 flex items-center justify-center">
-                        <span className="text-white font-bold text-lg">
-                          {name ? getInitials(name) : "U"}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex flex-col space-y-2">
-                    <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2">
-                      <Upload className="h-4 w-4" />
-                      <span>Upload Photo</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleAvatarFileChange}
-                        className="hidden"
-                      />
-                    </label>
-                    {avatar && (
-                      <button
-                        type="button"
-                        onClick={removeAvatar}
-                        className="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-2 rounded-md text-sm font-medium transition-colors text-center"
-                      >
-                        Remove Photo
-                      </button>
-                    )}
-                  </div>
+              </div>
+            </div>
+          )}
+
+          {isSignUp && (
+            <div>
+              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                Profile Picture
+              </label>
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  {avatar ? (
+                    <img
+                      src={avatar}
+                      alt="Profile preview"
+                      className="w-16 h-16 rounded-full object-cover border-2 border-gray-300 dark:border-gray-700"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center bg-orange-500 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600">
+                      <span className="text-white font-bold text-lg">
+                        {name ? getInitials(name) : "U"}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-col space-y-2">
+                  <label className="cursor-pointer px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white">
+                    <Upload className="h-4 w-4" />
+                    <span>Upload Photo</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarFileChange}
+                      className="hidden"
+                    />
+                  </label>
+                  {avatar && (
+                    <button
+                      type="button"
+                      onClick={removeAvatar}
+                      className="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-2 rounded-md text-sm font-medium transition-colors text-center"
+                    >
+                      Remove Photo
+                    </button>
+                  )}
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
           <div>
             <button
@@ -254,10 +297,10 @@ function Login() {
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
+              <div className="w-full border-t border-gray-300 dark:border-gray-700" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-100 text-gray-500">
+              <span className="px-2 bg-gray-100 text-gray-500 dark:bg-gray-900 dark:text-gray-500">
                 Or continue with
               </span>
             </div>
@@ -268,7 +311,7 @@ function Login() {
               type="button"
               onClick={handleGoogleSignIn}
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-2 px-4 border text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path
